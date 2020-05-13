@@ -7,6 +7,8 @@ from csv import writer
 import os.path
 import re
 import requests 
+import pandas as pd
+from datetime import datetime
 
 #GLOBAL VARIABLES
 tenant_names = []
@@ -121,6 +123,42 @@ for k in range(len(tenant_classes)):
                         endpoints.append(Endpoint(tenant_classes[k].tn,tenant_classes[k].anp,tenant_classes[k].epg,ip_tmp,mac_tmp,vlan_tmp,pod_tmp,node_tmp,ipg_tmp,tenant_classes[k].bd,tenant_classes[k].vrf))
             else:
                 path_tmp = "n/a"
+
+#WRITE ENDPOINT CLASSES TO XSLX FILE WITH PANDAS
+list_tn = []
+list_anp = []
+list_vrf = []
+list_bd = []
+list_epg = []
+list_pod = []
+list_node = []
+list_ipg = []
+list_ip = []
+list_mac = []
+list_vlan = []
+for x in range(len(endpoints)):
+    list_tn.append(endpoints[x].tn)
+    list_anp.append(endpoints[x].anp)
+    list_vrf.append(endpoints[x].vrf)
+    list_bd.append(endpoints[x].bd)
+    list_epg.append(endpoints[x].epg)
+    list_pod.append(endpoints[x].pod)
+    list_node.append(endpoints[x].node)
+    list_ipg.append(endpoints[x].ipg)
+    list_ip.append(endpoints[x].ip)
+    list_mac.append(endpoints[x].mac)
+    list_vlan.append(endpoints[x].vlan)
+now = datetime.now() 
+# current date and time
+date_time = now.strftime("%d%m%Y-%H%M")
+# Create some Pandas dataframes from some data.
+sheet_l3endpoints = pd.DataFrame({'Tenant':list_tn,'ANP':list_anp,'VRF':list_vrf,'BridgeDomain':list_bd,'EPG':list_epg,'Pod':list_pod,'Node':list_node,'IPG':list_ipg,'IP':list_ip,'MAC':list_mac,'VLAN':list_vlan})
+# Create a Pandas Excel writer using XlsxWriter as the engine.
+writer = pd.ExcelWriter(f"BAAC_APIC_Endpoints_{date_time}.xlsx", engine='xlsxwriter')
+# Write each dataframe to a different worksheet.
+sheet_l3endpoints.to_excel(writer, sheet_name='L2_Endpoint')
+# Close the Pandas Excel writer and output the Excel file.
+writer.save()        
 
 #WRITE ENDPOINT CLASSES TO CVS FILE     
 csv_filename = "Endpoint.csv"
