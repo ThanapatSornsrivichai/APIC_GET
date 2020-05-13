@@ -7,6 +7,8 @@ from csv import writer
 import os.path
 import re
 import requests 
+import pandas as pd
+from datetime import datetime
 
 #GLOBAL VARIABLES
 tenant_names = []
@@ -150,6 +152,19 @@ for x in range(len(l3out_endpoints)):
     list_ip.append(l3out_endpoints[x].ip)
     list_mac.append(l3out_endpoints[x].mac)
     list_vlan.append(l3out_endpoints[x].vlan) 
+    
+now = datetime.now() 
+# current date and time
+date_time = now.strftime("%d%m%Y-%H%M")
+# Create some Pandas dataframes from some data.
+sheet_l3endpoints = pd.DataFrame({'Tenant':list_tn,'Pod':list_pod,'VRF':list_vrf,'Node':list_node,'L3Out':list_l3out,'Domain':list_dom,'IP':list_ip,'MAC':list_mac,'VLAN':list_vlan})
+# Create a Pandas Excel writer using XlsxWriter as the engine.
+writer = pd.ExcelWriter(f"BAAC_APIC_Endpoints_{date_time}.xlsx", engine='xlsxwriter')
+# Write each dataframe to a different worksheet.
+sheet_l3endpoints.to_excel(writer, sheet_name='L3_Endpoint')
+# Close the Pandas Excel writer and output the Excel file.
+writer.save()        
+
 #WRITE CLASS L3Endpoint TO CVS FILE
 csv_filename = "Endpoint_L3.csv"
 file_exists = os.path.isfile(csv_filename)
