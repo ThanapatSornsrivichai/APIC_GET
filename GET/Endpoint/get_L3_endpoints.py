@@ -17,7 +17,6 @@ l3outs = []
 l3out_endpoints = []
 
 #CLASS FOR L3OUT (PATH,DOM,VRF)
-
 class L3Out:
     def __init__(self,path,tenant,dom,vrf,l3out,encap):
         self.path = path
